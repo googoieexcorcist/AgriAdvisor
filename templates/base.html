@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="{{ current_language }}" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ translate_text('AgriAdvisor', current_language) }}{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient-light: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --bg-gradient-dark: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
+            --container-bg-light: rgba(255, 255, 255, 0.9);
+            --container-bg-dark: rgba(45, 52, 54, 0.9);
+            --text-color-light: #2c3e50;
+            --text-color-dark: #ecf0f1;
+            --card-bg-light: rgba(255, 255, 255, 0.95);
+            --card-bg-dark: rgba(52, 73, 94, 0.95);
+            --card-shadow-light: rgba(0,0,0,0.1);
+            --card-shadow-dark: rgba(0,0,0,0.3);
+            --btn-primary: #27ae60;
+            --btn-primary-hover: #219a52;
+            --accent-color: #e74c3c;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: var(--bg-gradient-dark);
+            --container-bg: var(--container-bg-dark);
+            --text-color: var(--text-color-dark);
+            --card-bg: var(--card-bg-dark);
+            --card-shadow: var(--card-shadow-dark);
+        }
+
+        [data-theme="light"] {
+            --bg-color: var(--bg-gradient-light);
+            --container-bg: var(--container-bg-light);
+            --text-color: var(--text-color-light);
+            --card-bg: var(--card-bg-light);
+            --card-shadow: var(--card-shadow-light);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            min-height: calc(100vh - 4rem);
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-switch-wrapper {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px var(--card-shadow);
+        }
+
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px var(--card-shadow);
+        }
+
+        .language-selector select {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            outline: none;
+        }
+
+        .language-selector select option {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            width: 60px;
+            position: relative;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--btn-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        {% block extra_css %}{% endblock %}
+    </style>
+</head>
+<body>
+    <div class="theme-switch-wrapper">
+        <span>🌞</span>
+        <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+        <span>🌙</span>
+    </div>
+
+    <div class="language-selector">
+        <form action="{{ url_for('change_language') }}" method="POST" id="languageForm">
+            <select name="language" onchange="this.form.submit()" class="form-select">
+                {% for code, name in supported_languages.items() %}
+                <option value="{{ code }}" {% if code == current_language %}selected{% endif %}>
+                    {{ name }}
+                </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        themeToggle.checked = savedTheme === 'dark';
+
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

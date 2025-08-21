@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}{{ content.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="header">
+        <h1>{{ content.title }}</h1>
+        <p>{{ content.description }}</p>
+    </header>
+
+    <div class="main-content">
+        <div class="features-grid">
+            <a href="{{ url_for('crop_recommendation') }}" class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h2>{{ translate_text('Crop Recommendation', current_language) }}</h2>
+                <p>{{ translate_text('Get personalized crop recommendations based on soil conditions and environmental factors.', current_language) }}</p>
+            </a>
+
+            <a href="{{ url_for('yield_prediction') }}" class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2>{{ translate_text('Yield Prediction', current_language) }}</h2>
+                <p>{{ translate_text('Predict crop yields based on various parameters to optimize your farming strategy.', current_language) }}</p>
+            </a>
+
+            <a href="{{ url_for('crop_disease') }}" class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h2>{{ translate_text('Crop Disease Detection', current_language) }}</h2>
+                <p>{{ translate_text('Identify and manage crop diseases to protect your harvest.', current_language) }}</p>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        padding-top: 4rem;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .header h1 {
+        color: var(--text-color);
+        font-size: 2.8rem;
+        margin-bottom: 1rem;
+        position: relative;
+        display: inline-block;
+    }
+
+    .header h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 50%;
+        height: 3px;
+        background: var(--accent-color);
+        border-radius: 2px;
+    }
+
+    .header p {
+        color: var(--text-color);
+        font-size: 1.2rem;
+        line-height: 1.6;
+        opacity: 0.9;
+        max-width: 800px;
+        margin: 0 auto;
+        margin-top: 2rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        animation: fadeIn 1s ease-out;
+    }
+
+    .feature-card {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px var(--card-shadow);
+        text-decoration: none;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px var(--card-shadow);
+    }
+
+    .feature-icon {
+        background: linear-gradient(135deg, var(--btn-primary) 0%, var(--accent-color) 100%);
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .feature-icon i {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1);
+    }
+
+    .feature-card h2 {
+        margin: 0 0 1rem 0;
+        color: var(--text-color);
+        font-size: 1.5rem;
+    }
+
+    .feature-card p {
+        margin: 0;
+        color: var(--text-color);
+        opacity: 0.8;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header {
+            padding: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+        }
+        
+        .features-grid {
+            padding: 1rem;
+            gap: 1rem;
+        }
+
+        .feature-card {
+            padding: 1.5rem;
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+        .feature-icon i {
+            font-size: 1.5rem;
+        }
+
+        .feature-card h2 {
+            font-size: 1.2rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}{{ translate_text('Crop Disease Detection - AGRI-ADVISOR', current_language) }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">{{ content.title }}</h2>
+                    <p class="text-center">{{ content.description }}</p>
+                </div>
+                <div class="card-body">
+                    <form id="diseaseForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="imageUpload">Upload Leaf Image</label>
+                            <input type="file" class="form-control-file" id="imageUpload" name="file" accept="image/*" required>
+                        </div>
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary">Detect Disease</button>
+                        </div>
+                    </form>
+                    
+                    <div id="result" class="mt-4" style="display: none;">
+                        <div class="alert alert-info">
+                            <h4 class="alert-heading">Detection Result</h4>
+                            <p id="resultText"></p>
+                            <div class="progress mt-2">
+                                <div id="confidenceBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="error" class="mt-4" style="display: none;">
+                        <div class="alert alert-danger">
+                            <h4 class="alert-heading">Error</h4>
+                            <p id="errorText"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="text-center">Supported Crops</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Fruits</h4>
+                            <ul>
+                                <li>Apple</li>
+                                <li>Grape</li>
+                                <li>Tomato</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Vegetables</h4>
+                            <ul>
+                                <li>Corn (Maize)</li>
+                                <li>Potato</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('diseaseForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Hide previous results/errors
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+    
+    const formData = new FormData();
+    const fileInput = document.getElementById('imageUpload');
+    formData.append('file', fileInput.files[0]);
+    
+    try {
+        const response = await fetch('/crop-disease', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('errorText').textContent = result.error;
+            return;
+        }
+        
+        // Display result
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('resultText').textContent = result.message;
+        
+        // Update confidence bar
+        const confidenceBar = document.getElementById('confidenceBar');
+        const confidence = result.confidence * 100;
+        confidenceBar.style.width = `${confidence}%`;
+        confidenceBar.textContent = `${confidence.toFixed(1)}%`;
+        
+    } catch (error) {
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('errorText').textContent = 'An error occurred while processing the image';
+        console.error(error);
+    }
+});
+</script>
+
+{% block extra_css %}
+<style>
+    .header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem;
+        padding-top: 4rem;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .header h1 {
+        color: var(--text-color);
+        font-size: 2.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .header p {
+        color: var(--text-color);
+        font-size: 1.2rem;
+        line-height: 1.6;
+        opacity: 0.9;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .welcome-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 400px;
+        padding: 2rem;
+    }
+
+    .welcome-card {
+        background: var(--card-bg);
+        padding: 3rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px var(--card-shadow);
+        text-align: center;
+        max-width: 600px;
+        width: 100%;
+        animation: fadeIn 1s ease-out;
+        transition: all 0.3s ease;
+    }
+
+    .welcome-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px var(--card-shadow);
+    }
+
+    .welcome-icon {
+        font-size: 4rem;
+        color: var(--btn-primary);
+        margin-bottom: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .welcome-card:hover .welcome-icon {
+        transform: scale(1.1);
+        color: var(--accent-color);
+    }
+
+    .welcome-card h2 {
+        color: var(--text-color);
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+
+    .welcome-card p {
+        color: var(--text-color);
+        opacity: 0.8;
+        font-size: 1.2rem;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header {
+            padding: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        .welcome-section {
+            padding: 1rem;
+            min-height: 300px;
+        }
+
+        .welcome-card {
+            padding: 2rem;
+        }
+
+        .welcome-icon {
+            font-size: 3rem;
+        }
+
+        .welcome-card h2 {
+            font-size: 1.5rem;
+        }
+
+        .welcome-card p {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+{% endblock %} 

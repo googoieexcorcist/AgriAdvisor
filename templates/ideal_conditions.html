@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}{{ translate_text('Ideal Growing Conditions - AGRI-ADVISOR', current_language) }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="header">
+        <h1>{{ translate_text('Ideal Growing Conditions', current_language) }}</h1>
+        <p class="header-description">{{ translate_text('Learn about the optimal conditions for growing different crops', current_language) }}</p>
+    </header>
+
+    <div class="main-content">
+        <div class="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="cropSearch" placeholder="{{ translate_text('Search for a crop...', current_language) }}" class="search-input">
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="sort-controls">
+                <button class="control-btn" data-sort="az">
+                    <i class="fas fa-sort-alpha-down"></i>
+                    {{ translate_text('A-Z', current_language) }}
+                </button>
+                <button class="control-btn" data-sort="za">
+                    <i class="fas fa-sort-alpha-up"></i>
+                    {{ translate_text('Z-A', current_language) }}
+                </button>
+            </div>
+        </div>
+
+        <div class="crops-grid">
+            {% for crop, details in crop_details.items() %}
+            <div class="crop-card" data-crop="{{ crop|lower }}">
+                <div class="crop-header">
+                    <i class="fas fa-seedling crop-icon"></i>
+                    <h2>{{ translate_text(crop|title, current_language) }}</h2>
+                </div>
+                <div class="conditions-list">
+                    <div class="condition-item">
+                        <div class="condition-label">
+                            <i class="fas fa-flask"></i>
+                            <span>{{ translate_text('Nitrogen (N)', current_language) }}</span>
+                        </div>
+                        <span class="condition-value">{{ details.N }} kg/ha</span>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-label">
+                            <i class="fas fa-flask"></i>
+                            <span>{{ translate_text('Phosphorus (P)', current_language) }}</span>
+                        </div>
+                        <span class="condition-value">{{ details.P }} kg/ha</span>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-label">
+                            <i class="fas fa-flask"></i>
+                            <span>{{ translate_text('Potassium (K)', current_language) }}</span>
+                        </div>
+                        <span class="condition-value">{{ details.K }} kg/ha</span>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-label">
+                            <i class="fas fa-thermometer-half"></i>
+                            <span>{{ translate_text('Temperature', current_language) }}</span>
+                        </div>
+                        <span class="condition-value">{{ details.temperature }}</span>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-label">
+                            <i class="fas fa-tint"></i>
+                            <span>{{ translate_text('Humidity', current_language) }}</span>
+                        </div>
+                        <span class="condition-value">{{ details.humidity }}</span>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-label">
+                            <i class="fas fa-vial"></i>
+                            <span>pH</span>
+                        </div>
+                        <span class="condition-value">{{ details.ph }}</span>
+                    </div>
+                    <div class="condition-item">
+                        <div class="condition-label">
+                            <i class="fas fa-cloud-rain"></i>
+                            <span>{{ translate_text('Rainfall', current_language) }}</span>
+                        </div>
+                        <span class="condition-value">{{ details.rainfall }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .main-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .header-description {
+        color: var(--text-color);
+        opacity: 0.8;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+
+    .search-section {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: center;
+    }
+
+    .search-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--btn-primary);
+        font-size: 1.2rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 15px 25px 15px 50px;
+        border: 2px solid var(--btn-primary);
+        border-radius: 30px;
+        background: var(--card-bg);
+        color: var(--text-color);
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.2);
+    }
+
+    .controls-section {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+
+    .sort-controls {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .control-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        border: 2px solid var(--btn-primary);
+        background: var(--card-bg);
+        color: var(--text-color);
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .control-btn:hover {
+        background: var(--btn-primary);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .control-btn.active {
+        background: var(--btn-primary);
+        color: white;
+    }
+
+    .control-btn i {
+        font-size: 1rem;
+    }
+
+    .crops-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 2rem;
+        padding: 1rem;
+    }
+
+    .crop-card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 20px var(--card-shadow);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.5s ease;
+        border: 1px solid rgba(var(--text-color-rgb), 0.1);
+    }
+
+    .crop-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px var(--card-shadow);
+        border-color: var(--btn-primary);
+    }
+
+    .crop-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--btn-primary);
+    }
+
+    .crop-icon {
+        font-size: 2rem;
+        color: var(--btn-primary);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(var(--btn-primary-rgb), 0.1);
+        border-radius: 50%;
+    }
+
+    .crop-header h2 {
+        margin: 0;
+        color: var(--text-color);
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    .conditions-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+    }
+
+    .condition-item {
+        padding: 0.8rem;
+        border-radius: 12px;
+        background: rgba(var(--text-color-rgb), 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .condition-item:hover {
+        background: rgba(var(--btn-primary-rgb), 0.1);
+    }
+
+    .condition-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-color);
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .condition-label i {
+        color: var(--btn-primary);
+        font-size: 1rem;
+    }
+
+    .condition-value {
+        color: var(--btn-primary);
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: block;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+
+        .crops-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .crop-card {
+            padding: 1.5rem;
+        }
+
+        .conditions-list {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Search functionality
+    document.getElementById('cropSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const cropCards = document.querySelectorAll('.crop-card');
+
+        cropCards.forEach(card => {
+            const cropName = card.dataset.crop;
+            if (cropName.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
+    // Sorting controls
+    document.querySelectorAll('.sort-controls .control-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const sortDirection = this.dataset.sort;
+            const cropsGrid = document.querySelector('.crops-grid');
+            const cards = Array.from(cropsGrid.children);
+
+            // Sort the cards
+            cards.sort((a, b) => {
+                const cropNameA = a.querySelector('h2').textContent.toLowerCase();
+                const cropNameB = b.querySelector('h2').textContent.toLowerCase();
+                return sortDirection === 'az' 
+                    ? cropNameA.localeCompare(cropNameB)
+                    : cropNameB.localeCompare(cropNameA);
+            });
+
+            // Remove active class from all sort buttons
+            document.querySelectorAll('.sort-controls .control-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Reappend sorted cards
+            cards.forEach(card => cropsGrid.appendChild(card));
+
+            // Add fade animation to cards
+            cards.forEach((card, index) => {
+                card.style.animation = 'none';
+                card.offsetHeight; // Trigger reflow
+                card.style.animation = `fadeInUp 0.5s ease forwards ${index * 0.05}s`;
+            });
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yield Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient-light: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --bg-gradient-dark: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
+            --container-bg-light: rgba(255, 255, 255, 0.9);
+            --container-bg-dark: rgba(45, 52, 54, 0.9);
+            --text-color-light: #2c3e50;
+            --text-color-dark: #ecf0f1;
+            --input-bg-light: rgba(255, 255, 255, 0.95);
+            --input-bg-dark: rgba(52, 73, 94, 0.95);
+            --input-border-light: rgba(0,0,0,0.1);
+            --input-border-dark: rgba(255,255,255,0.1);
+            --btn-primary: #27ae60;
+            --btn-primary-hover: #219a52;
+            --btn-secondary: #95a5a6;
+            --btn-secondary-hover: #7f8c8d;
+            --accent-color: #e74c3c;
+            --select-arrow-light: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            --select-arrow-dark: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ecf0f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        }
+
+        [data-theme="dark"] {
+            --bg-color: var(--bg-gradient-dark);
+            --container-bg: var(--container-bg-dark);
+            --text-color: var(--text-color-dark);
+            --input-bg: var(--input-bg-dark);
+            --input-border: var(--input-border-dark);
+            --select-arrow: var(--select-arrow-dark);
+        }
+
+        [data-theme="light"] {
+            --bg-color: var(--bg-gradient-light);
+            --container-bg: var(--container-bg-light);
+            --text-color: var(--text-color-light);
+            --input-bg: var(--input-bg-light);
+            --input-border: var(--input-border-light);
+            --select-arrow: var(--select-arrow-light);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.6s ease;
+        }
+
+        .theme-switch-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            background: var(--input-bg);
+            padding: 10px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .theme-switch {
+            display: inline-block;
+            height: 34px;
+            width: 60px;
+            position: relative;
+        }
+
+        .theme-switch input {
+            display: none;
+        }
+
+        .slider {
+            background-color: #ccc;
+            bottom: 0;
+            cursor: pointer;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            background-color: #fff;
+            bottom: 4px;
+            content: "";
+            height: 26px;
+            left: 4px;
+            position: absolute;
+            transition: .4s;
+            width: 26px;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--btn-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-top: 1rem;
+        }
+
+        .header h1 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .header p {
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .crop-info {
+            background: rgba(39, 174, 96, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: left;
+        }
+
+        .crop-info ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0.5rem 0 0 0;
+        }
+
+        .crop-info li {
+            margin: 0.3rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .crop-info li:before {
+            content: "•";
+            color: var(--btn-primary);
+            position: absolute;
+            left: 0.5rem;
+        }
+
+        form {
+            display: grid;
+            gap: 1.5rem;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: slideUp 0.6s ease;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-color);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        label {
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select {
+            padding: 1rem 1rem 1rem 2.5rem;
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: var(--input-bg);
+            color: var(--text-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        select {
+            appearance: none;
+            background-image: var(--select-arrow);
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 3rem;
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--btn-primary);
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            transition: 0.4s ease;
+            z-index: -1;
+            border-radius: 30px;
+        }
+
+        .btn-primary {
+            background: var(--btn-primary);
+            color: white;
+        }
+
+        .btn-primary::before {
+            background: var(--accent-color);
+        }
+
+        .btn-secondary {
+            background: var(--btn-secondary);
+            color: white;
+        }
+
+        .btn-secondary::before {
+            background: var(--btn-secondary-hover);
+        }
+
+        .btn:hover::before {
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(127, 140, 141, 0.3);
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.4s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transform: translateY(20px);
+        }
+
+        .result.success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result.error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .unit-conversions {
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .unit-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--btn-primary);
+            background: transparent;
+            color: var(--text-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .unit-btn:hover {
+            background: var(--btn-primary);
+            color: white;
+        }
+
+        .unit-btn.active {
+            background: var(--btn-primary);
+            color: white;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-color);
+        }
+
+        .back-link:hover i {
+            transform: translateX(-5px);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin: 0;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-group {
+                gap: 0.3rem;
+            }
+
+            input, select {
+                padding: 0.8rem 0.8rem 0.8rem 2.5rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="theme-switch-wrapper">
+            <span>🌞</span>
+            <label class="theme-switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+            <span>🌙</span>
+        </div>
+
+        <div class="header">
+            <h1>Yield Prediction</h1>
+            <p>Enter crop and environmental parameters to predict yield per hectare per season/year</p>
+            <div class="crop-info">
+                <p><strong>Note:</strong></p>
+                <ul>
+                    <li>Rice: 2-3 seasons per year possible</li>
+                    <li>Maize: 2 seasons per year possible</li>
+                    <li>Wheat: 1 season per year</li>
+                    <li>Cotton: 1 season per year (lint yield)</li>
+                    <li>Sugarcane: 1 season per year (12-14 months crop)</li>
+                </ul>
+            </div>
+        </div>
+
+        <form id="yieldForm">
+            <div class="form-group">
+                <label for="crop">Crop Type</label>
+                <i class="fas fa-leaf"></i>
+                <select id="crop" name="crop" required>
+                    <option value="">Select a crop</option>
+                    <option value="rice">Rice (per season)</option>
+                    <option value="wheat">Wheat (per year)</option>
+                    <option value="maize">Maize (per season)</option>
+                    <option value="cotton">Cotton (per year)</option>
+                    <option value="sugarcane">Sugarcane (per year)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="N">Nitrogen (N)</label>
+                <i class="fas fa-flask"></i>
+                <input type="number" id="N" name="N" required step="0.01" min="0" placeholder="e.g., 40">
+            </div>
+
+            <div class="form-group">
+                <label for="P">Phosphorus (P)</label>
+                <i class="fas fa-vial"></i>
+                <input type="number" id="P" name="P" required step="0.01" min="0" placeholder="e.g., 50">
+            </div>
+
+            <div class="form-group">
+                <label for="K">Potassium (K)</label>
+                <i class="fas fa-prescription-bottle"></i>
+                <input type="number" id="K" name="K" required step="0.01" min="0" placeholder="e.g., 30">
+            </div>
+
+            <div class="form-group">
+                <label for="temperature">Temperature (°C)</label>
+                <i class="fas fa-temperature-high"></i>
+                <input type="number" id="temperature" name="temperature" required step="0.01" placeholder="e.g., 25">
+            </div>
+
+            <div class="form-group">
+                <label for="humidity">Humidity (%)</label>
+                <i class="fas fa-tint"></i>
+                <input type="number" id="humidity" name="humidity" required step="0.01" min="0" max="100" placeholder="e.g., 70">
+            </div>
+
+            <div class="form-group">
+                <label for="ph">pH Level</label>
+                <i class="fas fa-chart-bar"></i>
+                <input type="number" id="ph" name="ph" required step="0.01" min="0" max="14" placeholder="e.g., 6.5">
+            </div>
+
+            <div class="form-group">
+                <label for="rainfall">Rainfall (mm)</label>
+                <i class="fas fa-cloud-rain"></i>
+                <input type="number" id="rainfall" name="rainfall" required step="0.01" min="0" placeholder="e.g., 200">
+            </div>
+
+            <div class="form-group">
+                <label for="unit">Yield Unit</label>
+                <i class="fas fa-balance-scale"></i>
+                <select id="unit" name="unit" required>
+                    <option value="tonnes">Tonnes per hectare</option>
+                    <option value="quintals">Quintals per hectare</option>
+                    <option value="kg">Kilograms per hectare</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> Predict Yield
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </form>
+
+        <div id="result" class="result"></div>
+
+        <div style="text-align: center;">
+            <a href="/" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        themeToggle.checked = savedTheme === 'dark';
+
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                html.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Form submission with loading state
+        document.getElementById('yieldForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const form = this;
+            const result = document.getElementById('result');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            // Show loading state
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+            result.style.opacity = '0';
+            result.style.transform = 'translateY(20px)';
+            
+            try {
+                // Get form data and convert to JSON
+                const formData = {
+                    crop: form.crop.value,
+                    N: parseFloat(form.N.value),
+                    P: parseFloat(form.P.value),
+                    K: parseFloat(form.K.value),
+                    temperature: parseFloat(form.temperature.value),
+                    humidity: parseFloat(form.humidity.value),
+                    ph: parseFloat(form.ph.value),
+                    rainfall: parseFloat(form.rainfall.value)
+                };
+
+                // Send as JSON
+                const response = await fetch('/predict-yield', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                setTimeout(() => {
+                    if (data.success) {
+                        const yieldValue = parseFloat(data.yield);
+                        let convertedYield;
+                        let unit;
+                        
+                        // Add seasonal context based on response
+                        const periodNote = data.period === 'season' ? 
+                            ` (per ${data.period}, ${data.seasons_per_year} seasons possible per year)` : 
+                            ` (per ${data.period})`;
+                        
+                        // Convert yield to selected unit
+                        switch(form.unit.value) {
+                            case 'tonnes':
+                                convertedYield = yieldValue;
+                                unit = 'tonnes/hectare';
+                                break;
+                            case 'quintals':
+                                convertedYield = yieldValue * 10; // 1 tonne = 10 quintals
+                                unit = 'quintals/hectare';
+                                break;
+                            case 'kg':
+                                convertedYield = yieldValue * 1000; // 1 tonne = 1000 kg
+                                unit = 'kg/hectare';
+                                break;
+                        }
+
+                        result.className = 'result success';
+                        result.innerHTML = `
+                            <div>
+                                <i class="fas fa-check-circle"></i>
+                                <strong>Predicted Yield:</strong> ${convertedYield.toFixed(2)} ${unit}${periodNote}
+                                <div class="unit-conversions">
+                                    <button onclick="updateUnit('tonnes', ${yieldValue})" class="unit-btn ${form.unit.value === 'tonnes' ? 'active' : ''}">Tonnes</button>
+                                    <button onclick="updateUnit('quintals', ${yieldValue})" class="unit-btn ${form.unit.value === 'quintals' ? 'active' : ''}">Quintals</button>
+                                    <button onclick="updateUnit('kg', ${yieldValue})" class="unit-btn ${form.unit.value === 'kg' ? 'active' : ''}">Kilograms</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        result.className = 'result error';
+                        result.innerHTML = `<i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> ${data.error}`;
+                    }
+                    result.style.opacity = '1';
+                    result.style.transform = 'translateY(0)';
+                }, 300);
+            } catch (error) {
+                console.error('Error:', error);
+                setTimeout(() => {
+                    result.className = 'result error';
+                    result.innerHTML = '<i class="fas fa-exclamation-circle"></i> <strong>Error:</strong> Something went wrong. Please try again.';
+                    result.style.opacity = '1';
+                    result.style.transform = 'translateY(0)';
+                }, 300);
+            } finally {
+                // Restore button state
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Function to update unit display
+        function updateUnit(unit, baseYield) {
+            const result = document.getElementById('result');
+            let convertedYield;
+            let unitText;
+            
+            // Get the current crop for seasonal note
+            const cropSelect = document.getElementById('crop');
+            const selectedCrop = cropSelect.value;
+            
+            // Get period and seasons info from the result text
+            const resultText = result.textContent;
+            const periodMatch = resultText.match(/\((.*?)\)/);
+            const periodNote = periodMatch ? ` (${periodMatch[1]})` : '';
+            
+            switch(unit) {
+                case 'tonnes':
+                    convertedYield = baseYield;
+                    unitText = 'tonnes/hectare';
+                    break;
+                case 'quintals':
+                    convertedYield = baseYield * 10;
+                    unitText = 'quintals/hectare';
+                    break;
+                case 'kg':
+                    convertedYield = baseYield * 1000;
+                    unitText = 'kg/hectare';
+                    break;
+            }
+
+            // Update the display
+            const yieldDisplay = result.querySelector('strong').nextSibling;
+            yieldDisplay.textContent = ` ${convertedYield.toFixed(2)} ${unitText}${periodNote}`;
+
+            // Update active button state
+            const buttons = result.querySelectorAll('.unit-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase().includes(unit)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Add input focus effects
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.querySelector('i').style.color = 'var(--btn-primary)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.querySelector('i').style.color = 'var(--text-color)';
+                this.parentElement.querySelector('i').style.opacity = '0.7';
+            });
+        });
+    </script>
+</body>
+</html> 

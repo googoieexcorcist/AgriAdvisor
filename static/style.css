@@ -1,0 +1,231 @@
+/* Base Setup */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    transition: background 0.4s ease, color 0.4s ease;
+    min-height: 100vh;
+}
+
+/* Container */
+.container {
+    background: rgba(255, 255, 255, 0.85);
+    padding: 30px;
+    margin: 30px 0;
+    border-radius: 18px;
+    width: 90%;
+    max-width: 750px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    backdrop-filter: blur(10px);
+    transition: background 0.3s ease;
+}
+
+/* Header */
+h1 {
+    text-align: center;
+    margin: 0;
+    font-size: 28px;
+    letter-spacing: 1px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* Form Layout */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input, button {
+    padding: 12px 16px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+input:hover {
+    border-color: #27ae60;
+}
+
+input:focus {
+    border-color: #27ae60;
+    outline: none;
+    background: #f9f9f9;
+}
+
+button {
+    background: #27ae60;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #1e8449;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* Result Text */
+#result {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 20px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 14px;
+    border: 1px solid #ccc;
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+th {
+    background: #27ae60;
+    color: white;
+    font-size: 16px;
+}
+
+tr:nth-child(even) {
+    background: #f2f2f2;
+}
+
+tr:hover {
+    background: #e9ffe7;
+}
+
+/* Links */
+.info-link {
+    color: #27ae60;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 10px 16px;
+    border: 2px solid #27ae60;
+    border-radius: 10px;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.info-link:hover {
+    background-color: #27ae60;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Button Group Layout */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-group button {
+    flex: 1;
+    margin: 10px 5px 0 5px;
+}
+
+/* Theme Toggle Button */
+.theme-button {
+    padding: 10px 14px;
+    border: none;
+    background: #27ae60;
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.theme-button:hover {
+    background: #1e8449;
+    transform: scale(1.05);
+}
+
+/* Light Mode */
+body.light-mode {
+    background: #f7f7f7;
+    color: #34495e;
+}
+
+body.light-mode .container {
+    background: rgba(255, 255, 255, 0.95);
+    color: #34495e;
+}
+
+/* Dark Mode */
+body.dark-mode {
+    background: #121212;
+    color: #ecf0f1;
+}
+
+body.dark-mode .container {
+    background: rgba(44, 62, 80, 0.95);
+    color: #ecf0f1;
+}
+
+body.dark-mode input {
+    background: #34495e;
+    color: #ecf0f1;
+    border: 1px solid #34495e;
+}
+
+body.dark-mode input:focus {
+    background: #3d566e;
+    border-color: #27ae60;
+}
+
+body.dark-mode button, 
+body.dark-mode .theme-button {
+    background: #27ae60;
+    color: white;
+}
+
+body.dark-mode button:hover, 
+body.dark-mode .theme-button:hover {
+    background: #1e8449;
+}
+
+body.dark-mode .info-link {
+    border-color: #27ae60;
+    color: #27ae60;
+}
+
+body.dark-mode .info-link:hover {
+    background-color: #27ae60;
+    color: white;
+}
+
+body.dark-mode table {
+    border-color: #34495e;
+}
+
+body.dark-mode th {
+    background: #27ae60;
+}
+
+body.dark-mode tr:nth-child(even) {
+    background: #34495e;
+}
+
+body.dark-mode tr:hover {
+    background: #3d566e;
+}

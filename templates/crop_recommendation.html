@@ -1,0 +1,621 @@
+{% extends "base.html" %}
+
+{% block title %}{{ translate_text('Crop Recommendation - AGRI-ADVISOR', current_language) }}{% endblock %}
+
+{% block head %}
+    <!-- Add Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header class="header">
+        <h1>{{ translate_text('Crop Recommendation', current_language) }}</h1>
+        <p>{{ translate_text('Get personalized crop recommendations based on your soil conditions', current_language) }}</p>
+    </header>
+
+    <div class="main-content">
+        <div class="conditions-link-section">
+            <div class="conditions-content">
+                <div class="conditions-text">
+                    <h2>{{ translate_text('Growing Conditions Guide', current_language) }}</h2>
+                    <p>{{ translate_text('Explore optimal growing conditions for various crops to make informed decisions.', current_language) }}</p>
+                </div>
+                <a href="{{ url_for('ideal_conditions') }}" class="view-conditions-btn">
+                    <i class="fas fa-leaf"></i>
+                    {{ translate_text('View Growing Conditions', current_language) }}
+                </a>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>{{ translate_text('Enter Your Soil Parameters', current_language) }}</h2>
+            <form id="recommendationForm" class="input-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="N">{{ translate_text('Nitrogen (N)', current_language) }}</label>
+                        <input type="number" id="N" name="N" required step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="P">{{ translate_text('Phosphorus (P)', current_language) }}</label>
+                        <input type="number" id="P" name="P" required step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="K">{{ translate_text('Potassium (K)', current_language) }}</label>
+                        <input type="number" id="K" name="K" required step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="temperature">{{ translate_text('Temperature (°C)', current_language) }}</label>
+                        <input type="number" id="temperature" name="temperature" required step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="humidity">{{ translate_text('Humidity (%)', current_language) }}</label>
+                        <input type="number" id="humidity" name="humidity" required step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ph">{{ translate_text('pH', current_language) }}</label>
+                        <input type="number" id="ph" name="ph" required step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="rainfall">{{ translate_text('Rainfall (mm)', current_language) }}</label>
+                        <input type="number" id="rainfall" name="rainfall" required step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn submit-btn">
+                        <i class="fas fa-search"></i>
+                        {{ translate_text('Get Recommendation', current_language) }}
+                    </button>
+                    <button type="reset" class="btn reset-btn">
+                        <i class="fas fa-redo"></i>
+                        {{ translate_text('Reset Form', current_language) }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div id="result" class="result-section" style="display: none;">
+            <h2>{{ translate_text('Recommended Crop', current_language) }}</h2>
+            <div class="recommendation-card">
+                <i class="fas fa-seedling result-icon"></i>
+                <h3 id="recommendedCrop"></h3>
+            </div>
+            
+            <div class="visualization-section">
+                <div class="parameters-grid">
+                    <div class="parameter-card" id="nCard">
+                        <i class="fas fa-flask"></i>
+                        <div class="parameter-info">
+                            <span class="parameter-label">N</span>
+                            <span class="parameter-value" id="nValue">-</span>
+                        </div>
+                    </div>
+                    <div class="parameter-card" id="pCard">
+                        <i class="fas fa-flask"></i>
+                        <div class="parameter-info">
+                            <span class="parameter-label">P</span>
+                            <span class="parameter-value" id="pValue">-</span>
+                        </div>
+                    </div>
+                    <div class="parameter-card" id="kCard">
+                        <i class="fas fa-flask"></i>
+                        <div class="parameter-info">
+                            <span class="parameter-label">K</span>
+                            <span class="parameter-value" id="kValue">-</span>
+                        </div>
+                    </div>
+                    <div class="parameter-card" id="tempCard">
+                        <i class="fas fa-thermometer-half"></i>
+                        <div class="parameter-info">
+                            <span class="parameter-label">{{ translate_text('Temperature', current_language) }}</span>
+                            <span class="parameter-value" id="tempValue">-</span>
+                        </div>
+                    </div>
+                    <div class="parameter-card" id="humidityCard">
+                        <i class="fas fa-tint"></i>
+                        <div class="parameter-info">
+                            <span class="parameter-label">{{ translate_text('Humidity', current_language) }}</span>
+                            <span class="parameter-value" id="humidityValue">-</span>
+                        </div>
+                    </div>
+                    <div class="parameter-card" id="phCard">
+                        <i class="fas fa-vial"></i>
+                        <div class="parameter-info">
+                            <span class="parameter-label">pH</span>
+                            <span class="parameter-value" id="phValue">-</span>
+                        </div>
+                    </div>
+                    <div class="parameter-card" id="rainfallCard">
+                        <i class="fas fa-cloud-rain"></i>
+                        <div class="parameter-info">
+                            <span class="parameter-label">{{ translate_text('Rainfall', current_language) }}</span>
+                            <span class="parameter-value" id="rainfallValue">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_css %}
+<style>
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .conditions-link-section {
+        background: linear-gradient(135deg, var(--btn-primary) 0%, var(--accent-color) 100%);
+        padding: 0.5rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px var(--card-shadow);
+    }
+
+    .conditions-content {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .conditions-text {
+        flex: 1;
+    }
+
+    .conditions-text h2 {
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .conditions-text p {
+        color: var(--text-color);
+        opacity: 0.8;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .form-section {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px var(--card-shadow);
+    }
+
+    .input-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        color: var(--text-color);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .form-group input {
+        padding: 12px 15px;
+        border: 2px solid rgba(var(--btn-primary-rgb), 0.3);
+        border-radius: 12px;
+        background: var(--card-bg);
+        color: var(--text-color);
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: var(--btn-primary);
+        box-shadow: 0 0 0 3px rgba(var(--btn-primary-rgb), 0.2);
+    }
+
+    .form-group input::placeholder {
+        color: rgba(var(--text-color-rgb), 0.4);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 30px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .submit-btn {
+        background: var(--btn-primary);
+        color: white;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(var(--btn-primary-rgb), 0.3);
+    }
+
+    .reset-btn {
+        background: rgba(var(--text-color-rgb), 0.1);
+        color: var(--text-color);
+    }
+
+    .reset-btn:hover {
+        background: rgba(var(--text-color-rgb), 0.2);
+        transform: translateY(-2px);
+    }
+
+    .view-conditions-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--btn-primary);
+        color: white;
+        border: none;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+    }
+
+    .view-conditions-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(var(--btn-primary-rgb), 0.3);
+    }
+
+    .result-section {
+        background: var(--card-bg);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px var(--card-shadow);
+        text-align: center;
+        animation: fadeInUp 0.5s ease;
+    }
+
+    .recommendation-card {
+        margin-top: 2rem;
+        padding: 2.5rem;
+        border-radius: 15px;
+        background: linear-gradient(135deg, rgba(var(--btn-primary-rgb), 0.1) 0%, rgba(var(--accent-color-rgb), 0.1) 100%);
+    }
+
+    .result-icon {
+        font-size: 4rem;
+        color: var(--btn-primary);
+        margin-bottom: 1rem;
+    }
+
+    #recommendedCrop {
+        font-size: 2.5rem;
+        color: var(--btn-primary);
+        margin: 1rem 0;
+        text-transform: capitalize;
+    }
+
+    .visualization-section {
+        margin-top: 2rem;
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+
+    .parameters-grid {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .parameter-card {
+        background: var(--card-bg);
+        padding: 1rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .parameter-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px var(--card-shadow);
+    }
+
+    .parameter-card i {
+        font-size: 1.5rem;
+        color: var(--btn-primary);
+        background: rgba(var(--btn-primary-rgb), 0.1);
+        padding: 0.8rem;
+        border-radius: 10px;
+    }
+
+    .parameter-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .parameter-label {
+        font-size: 0.9rem;
+        color: var(--text-color);
+        opacity: 0.8;
+    }
+
+    .parameter-value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--btn-primary);
+    }
+
+    /* Enhanced Mobile Styles */
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 1rem;
+        }
+
+        .conditions-content {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .form-section {
+            padding: 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+        }
+
+        .visualization-section {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .parameters-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .parameter-card {
+            padding: 0.8rem;
+        }
+
+        .parameter-card i {
+            font-size: 1.2rem;
+            padding: 0.6rem;
+        }
+
+        .parameter-value {
+            font-size: 1.1rem;
+        }
+
+        #recommendedCrop {
+            font-size: 2rem;
+        }
+
+        /* Add bottom navigation for mobile */
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            padding: 0.8rem;
+            box-shadow: 0 -5px 15px var(--card-shadow);
+            display: none;
+        }
+
+        .mobile-nav-content {
+            display: flex;
+            justify-content: space-around;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .mobile-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .mobile-nav-btn i {
+            font-size: 1.2rem;
+            color: var(--btn-primary);
+        }
+
+        .mobile-nav-btn.active {
+            color: var(--btn-primary);
+        }
+
+        /* Add pull-to-refresh indicator */
+        .refresh-indicator {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .refresh-indicator.visible {
+            display: block;
+        }
+
+        /* Improve touch targets */
+        .form-group input,
+        .btn,
+        .view-conditions-btn {
+            min-height: 44px;
+        }
+    }
+
+    /* Dark mode enhancements */
+    @media (prefers-color-scheme: dark) {
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .parameter-card {
+            background: rgba(255, 255, 255, 0.05);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+    let soilChart = null;
+    let envChart = null;
+
+    function updateParameterCards(data) {
+        try {
+            document.getElementById('nValue').textContent = parseFloat(data.N).toFixed(2) + ' kg/ha';
+            document.getElementById('pValue').textContent = parseFloat(data.P).toFixed(2) + ' kg/ha';
+            document.getElementById('kValue').textContent = parseFloat(data.K).toFixed(2) + ' kg/ha';
+            document.getElementById('tempValue').textContent = parseFloat(data.temperature).toFixed(2) + ' °C';
+            document.getElementById('humidityValue').textContent = parseFloat(data.humidity).toFixed(2) + ' %';
+            document.getElementById('phValue').textContent = parseFloat(data.ph).toFixed(2);
+            document.getElementById('rainfallValue').textContent = parseFloat(data.rainfall).toFixed(2) + ' mm';
+        } catch (error) {
+            console.error('Error updating parameter cards:', error);
+        }
+    }
+
+    document.getElementById('recommendationForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        try {
+            const formData = new FormData(this);
+            const data = {
+                N: parseFloat(formData.get('N')),
+                P: parseFloat(formData.get('P')),
+                K: parseFloat(formData.get('K')),
+                temperature: parseFloat(formData.get('temperature')),
+                humidity: parseFloat(formData.get('humidity')),
+                ph: parseFloat(formData.get('ph')),
+                rainfall: parseFloat(formData.get('rainfall'))
+            };
+
+            // Validate input values
+            for (const [key, value] of Object.entries(data)) {
+                if (isNaN(value)) {
+                    throw new Error(`Please enter a valid number for ${key}`);
+                }
+            }
+            
+            const response = await fetch('/predict-crop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                document.getElementById('recommendedCrop').textContent = result.crop;
+                document.getElementById('result').style.display = 'block';
+                
+                // Update parameter cards only
+                updateParameterCards(data);
+                
+                // Smooth scroll to result
+                document.getElementById('result').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            } else {
+                throw new Error(result.error || 'Failed to get recommendation');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'An error occurred while processing your request. Please check your input values and try again.');
+        }
+    });
+
+    // Reset form and hide results
+    document.getElementById('recommendationForm').addEventListener('reset', function(e) {
+        document.getElementById('result').style.display = 'none';
+    });
+
+    // Mobile enhancements
+    if ('ontouchstart' in window) {
+        let startY = 0;
+        let refreshIndicator = document.createElement('div');
+        refreshIndicator.className = 'refresh-indicator';
+        refreshIndicator.innerHTML = '⬇️ Pull to refresh';
+        document.querySelector('.main-content').prepend(refreshIndicator);
+
+        document.addEventListener('touchstart', function(e) {
+            startY = e.touches[0].pageY;
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            const y = e.touches[0].pageY;
+            const scroll = window.scrollY;
+            
+            if (scroll === 0 && y - startY > 50) {
+                refreshIndicator.classList.add('visible');
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            if (refreshIndicator.classList.contains('visible')) {
+                refreshIndicator.classList.remove('visible');
+                location.reload();
+            }
+        });
+    }
+    </script>
+{% endblock %}
+{% endblock %} 
